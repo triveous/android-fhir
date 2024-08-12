@@ -58,6 +58,10 @@ internal class DefaultResourceConsolidator(private val database: Database) : Res
           when (it) {
             is BundleComponentUploadResponseMapping -> updateVersionIdAndLastUpdated(it.output)
             is ResourceUploadResponseMapping -> updateVersionIdAndLastUpdated(it.output)
+            is NOOPUploadResponseMapping -> {
+              // Don't don anything when this is NOOPUploadResponseMapping as the request is
+              // not sent to the server
+            }
           }
         }
       }
@@ -115,6 +119,9 @@ internal class HttpPostResourceConsolidator(private val database: Database) : Re
               preSyncResourceId?.let { preSyncResourceId ->
                 updateResourcePostSync(preSyncResourceId, it.output)
               }
+            }
+            is NOOPUploadResponseMapping -> {
+              // Nothing needs to shown
             }
           }
         }

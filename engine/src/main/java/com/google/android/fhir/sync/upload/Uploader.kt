@@ -24,6 +24,7 @@ import com.google.android.fhir.sync.upload.request.BundleUploadRequestMapping
 import com.google.android.fhir.sync.upload.request.UploadRequestGenerator
 import com.google.android.fhir.sync.upload.request.UploadRequestMapping
 import com.google.android.fhir.sync.upload.request.UrlUploadRequestMapping
+import kotlinx.coroutines.flow.Flow
 import java.lang.IllegalStateException
 import kotlinx.coroutines.flow.asFlow
 import kotlinx.coroutines.flow.transformWhile
@@ -49,17 +50,25 @@ internal class Uploader(
   private val patchGenerator: PatchGenerator,
   private val requestGenerator: UploadRequestGenerator,
 ) {
-  suspend fun upload(localChanges: List<LocalChange>) =
-    localChanges
-      .let { patchGenerator.generate(it) }
-      .let { requestGenerator.generateUploadRequests(it) }
+  suspend fun upload(localChanges: List<LocalChange>): Flow<UploadRequestResult> {
+
+    val patches = patchGenerator.generate(localChanges)
+    if (patches.isEmpty()){
+      Timber.d("No patches generated. Marking as successful upload")
+      val mapping = NOOPUploadResponseMapping(localChanges)
+      return listOf(UploadRequestResult.Success(listOf(mapping))).asFlow()
+    }
+
+    return requestGenerator.generateUploadRequests(patches)
       .asFlow()
       .transformWhile {
         with(handleUploadRequest(it)) {
           emit(this)
           this !is UploadRequestResult.Failure
         }
-      }
+    }
+  }
+
 
   private fun handleSuccessfulUploadResponse(
     mappedUploadRequest: UploadRequestMapping,
@@ -152,7 +161,7 @@ sealed class UploadRequestResult {
 
 sealed class SuccessfulUploadResponseMapping(
   open val localChanges: List<LocalChange>,
-  open val output: IBase,
+  open val output: IBase?,
 )
 
 internal data class ResourceUploadResponseMapping(
@@ -164,3 +173,7 @@ internal data class BundleComponentUploadResponseMapping(
   override val localChanges: List<LocalChange>,
   override val output: Bundle.BundleEntryResponseComponent,
 ) : SuccessfulUploadResponseMapping(localChanges, output)
+
+internal data class NOOPUploadResponseMapping(
+  override val localChanges: List<LocalChange>,
+) : SuccessfulUploadResponseMapping(localChanges, null)

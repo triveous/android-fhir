@@ -28,6 +28,7 @@ import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import org.hl7.fhir.r4.model.ResourceType
+import timber.log.Timber
 
 enum class SyncOperation {
   DOWNLOAD,
@@ -91,6 +92,9 @@ internal class FhirSynchronizer(
       setSyncState(SyncJobStatus.Started())
 
       return listOf(download(), upload())
+        .onEach {
+          Timber.d("Something",it)
+        }
         .filterIsInstance<SyncResult.Error>()
         .flatMap { it.exceptions }
         .let {
