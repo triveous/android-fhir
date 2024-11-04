@@ -139,4 +139,7 @@
     <string name="space_asterisk">\u0020\u002a</string>
     <string name="repeated_group_title">%1$s. %2$s</string>
     <string name="add_repeated_group_item">Add %1$s</string>
+    <string name="validation_dialogue_note">Please fill in all the required fields to continue.</string>
+    <string name="note">Note</string>
+    <string name="ok">OK</string>
 </resources>

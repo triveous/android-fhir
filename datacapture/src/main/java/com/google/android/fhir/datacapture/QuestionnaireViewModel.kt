@@ -238,6 +238,7 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
       ?: application.getString(R.string.submit_questionnaire)
 
   private var onSubmitButtonClickListener: () -> Unit = {}
+  private var onNextButtonClickListener: () -> Unit = {}
 
   private var onCancelButtonClickListener: () -> Unit = {}
 
@@ -498,6 +499,12 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
         }
       }
 
+  internal fun hasRequiredFieldValidationErrors() : Boolean {
+    return currentPageItems.filterIsInstance<QuestionnaireAdapterItem.Question>().any {
+      (it.item.questionnaireItem.required && (it.item.validationResult is NotValidated || it.item.validationResult is Invalid) && it.item.answers.isEmpty())
+    }
+  }
+
   internal fun goToPreviousPage() {
     when (entryMode) {
       EntryMode.PRIOR_EDIT,
@@ -521,6 +528,9 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
     when (entryMode) {
       EntryMode.PRIOR_EDIT,
       EntryMode.SEQUENTIAL, -> {
+        if (true){
+          onNextButtonClickListener.invoke()
+        }
         validateCurrentPageItems {
           val nextPageIndex =
             pages!!.indexOfFirst {
@@ -559,6 +569,11 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
 
   internal fun setOnSubmitButtonClickListener(onClickAction: () -> Unit) {
     onSubmitButtonClickListener = onClickAction
+  }
+
+
+  internal fun setOnNextButtonClickListener(onClickAction: () -> Unit) {
+    onNextButtonClickListener = onClickAction
   }
 
   internal fun setOnCancelButtonClickListener(onClickAction: () -> Unit) {
