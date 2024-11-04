@@ -528,9 +528,7 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
     when (entryMode) {
       EntryMode.PRIOR_EDIT,
       EntryMode.SEQUENTIAL, -> {
-        if (true){
-          onNextButtonClickListener.invoke()
-        }
+        onNextButtonClickListener.invoke()
         validateCurrentPageItems {
           val nextPageIndex =
             pages!!.indexOfFirst {
