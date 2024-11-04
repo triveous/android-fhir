@@ -22,6 +22,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.annotation.VisibleForTesting
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.view.ContextThemeWrapper
 import androidx.core.content.res.use
 import androidx.core.os.bundleOf
@@ -121,6 +122,15 @@ class QuestionnaireFragment : Fragment() {
         }
       }
     }
+
+    viewModel.setOnNextButtonClickListener {
+      lifecycleScope.launch {
+        if (viewModel.hasRequiredFieldValidationErrors()){
+          showDialogue()
+        }
+      }
+    }
+
     val questionnaireProgressIndicator: LinearProgressIndicator =
       view.findViewById(R.id.questionnaire_progress_indicator)
     val questionnaireEditAdapter =
@@ -264,6 +274,17 @@ class QuestionnaireFragment : Fragment() {
           )
       }
     }
+  }
+
+  private fun showDialogue() {
+    AlertDialog.Builder(requireContext())
+      .setTitle(R.string.note)
+      .setMessage(R.string.validation_dialogue_note)
+      .setPositiveButton(R.string.ok) { dialog, _ ->
+        dialog.dismiss()
+      }
+      .create()
+      .show()
   }
 
   /** Calculates the progress percentage from given [count] and [totalCount] values. */
