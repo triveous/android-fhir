@@ -239,6 +239,7 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
 
   private var onSubmitButtonClickListener: () -> Unit = {}
   private var onNextButtonClickListener: () -> Unit = {}
+  private var onReviewButtonClickListener: () -> Unit = {}
 
   private var onCancelButtonClickListener: () -> Unit = {}
 
@@ -554,6 +555,7 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
       when (entryMode) {
         EntryMode.PRIOR_EDIT,
         EntryMode.SEQUENTIAL, -> {
+          onReviewButtonClickListener.invoke()
           validateCurrentPageItems { isInReviewModeFlow.value = true }
         }
         EntryMode.RANDOM -> {
@@ -572,6 +574,10 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
 
   internal fun setOnNextButtonClickListener(onClickAction: () -> Unit) {
     onNextButtonClickListener = onClickAction
+  }
+
+  internal fun setOnReviewButtonClickListener(onClickAction: () -> Unit) {
+    onReviewButtonClickListener = onClickAction
   }
 
   internal fun setOnCancelButtonClickListener(onClickAction: () -> Unit) {
